@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graficación de datos</title>
+    {% comment %} Importación de libreria tailwind css para estilos css{% endcomment %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% comment %} Importación de libreria que se usa para graficar los datos{% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+</head>
+<body>
+    {% comment %} Muestra el titulo y da opciones de navegación al usuario{% endcomment %}
+    <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+        <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
+            <div class="ml-4 mt-2">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Graficas de nacionalidad de los trabajadores</h3>
+            </div>
+                    <div class="ml-4 mt-4 flex-shrink-0 flex">
+                        <button type="button" onclick="window.location.href='../'" class="relative inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          <!-- Heroicon name: solid/phone -->
+                          <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400"  viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path d="M3.24,7.51c-0.146,0.142-0.146,0.381,0,0.523l5.199,5.193c0.234,0.238,0.633,0.064,0.633-0.262v-2.634c0.105-0.007,0.212-0.011,0.321-0.011c2.373,0,4.302,1.91,4.302,4.258c0,0.957-0.33,1.809-1.008,2.602c-0.259,0.307,0.084,0.762,0.451,0.572c2.336-1.195,3.73-3.408,3.73-5.924c0-3.741-3.103-6.783-6.916-6.783c-0.307,0-0.615,0.028-0.881,0.063V2.575c0-0.327-0.398-0.5-0.633-0.261L3.24,7.51 M4.027,7.771l4.301-4.3v2.073c0,0.232,0.21,0.409,0.441,0.366c0.298-0.056,0.746-0.123,1.184-0.123c3.402,0,6.172,2.709,6.172,6.041c0,1.695-0.718,3.24-1.979,4.352c0.193-0.51,0.293-1.045,0.293-1.602c0-2.76-2.266-5-5.046-5c-0.256,0-0.528,0.018-0.747,0.05C8.465,9.653,8.328,9.81,8.328,9.995v2.074L4.027,7.771z"></path>
+                          </svg>
+                          <span> Regresar a Inicio </span>
+                        </button>
+                        <button type="button" onclick="window.location.href='../datos/'" class="relative inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <!-- Heroicon name: solid/phone -->
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400"  viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path d="M3.24,7.51c-0.146,0.142-0.146,0.381,0,0.523l5.199,5.193c0.234,0.238,0.633,0.064,0.633-0.262v-2.634c0.105-0.007,0.212-0.011,0.321-0.011c2.373,0,4.302,1.91,4.302,4.258c0,0.957-0.33,1.809-1.008,2.602c-0.259,0.307,0.084,0.762,0.451,0.572c2.336-1.195,3.73-3.408,3.73-5.924c0-3.741-3.103-6.783-6.916-6.783c-0.307,0-0.615,0.028-0.881,0.063V2.575c0-0.327-0.398-0.5-0.633-0.261L3.24,7.51 M4.027,7.771l4.301-4.3v2.073c0,0.232,0.21,0.409,0.441,0.366c0.298-0.056,0.746-0.123,1.184-0.123c3.402,0,6.172,2.709,6.172,6.041c0,1.695-0.718,3.24-1.979,4.352c0.193-0.51,0.293-1.045,0.293-1.602c0-2.76-2.266-5-5.046-5c-0.256,0-0.528,0.018-0.747,0.05C8.465,9.653,8.328,9.81,8.328,9.995v2.074L4.027,7.771z"></path>
+                            </svg>
+                            <span> Regresar a mostrar todos los datos </span>
+                        </button>
+                    </div>
+        </div>
+    </div>
+</br>
+
+
+    {% comment %} Comienza el apartado de graficas {% endcomment %}
+    <canvas id="grafica" width="400" height="300"></canvas>
+    <script>
+        var data = JSON.parse("{{nacionalidad|escapejs}}");
+        // Obtener una referencia al elemento canvas del DOM
+        const $grafica = document.querySelector("#grafica");
+        let etiquetas = [];
+        let etiquetasdata = [];
+
+        for(var k in data) {
+            etiquetas.push(data[k].nacionalidad);
+            etiquetasdata.push(data[k].dcount);
+        }
+
+        // const etiquetas = [data[1].sexo, data[0].sexo]
+        // Podemos tener varios conjuntos de datos. Comencemos con uno
+        const datosVentas2020 = {
+            label: "Nacionalidad de los trabajadores",
+            data:  etiquetasdata, // La data es un arreglo que debe tener la misma cantidad de valores que la cantidad de etiquetas
+            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Color de fondo
+            borderColor: 'rgba(54, 162, 235, 1)', // Color del borde
+            borderWidth: 1,// Ancho del borde
+        };
+        new Chart($grafica, {
+            type: 'bar',// Tipo de gráfica
+            data: {
+                labels: etiquetas,
+                datasets: [
+                    datosVentas2020,
+                ]
+            },
+            options: 
+            {
+                scales: 
+                {
+                    yAxes: 
+                    [{
+                        ticks: 
+                        {
+                            beginAtZero: true
+                        }
+                    }],
+                },
+            }
+        });
+    </script>
+
+
+</body>
+</html>
